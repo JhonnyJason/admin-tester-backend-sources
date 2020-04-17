@@ -6,20 +6,25 @@ log = (arg) ->
     if allModules.debugmodule.modulesToDebug["startupmodule"]?  then console.log "[startupmodule]: " + arg
     return
 
-#region internal variables
+############################################################
 sci = null
-#endregion
+gitHandler = null
+dataHandler = null
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+############################################################
 startupmodule.initialize = () ->
     log "startupmodule.initialize"
     sci = allModules.scimodule
+    gitHandler = allModules.githandlermodule
+    dataHandler = allModules.datahandlermodule
+    return
 
-#region exposed functions
+############################################################
 startupmodule.serviceStartup = ->
     log "startupmodule.serviceStartup"
+    await gitHandler.startupCheck()
+    await dataHandler.loadAvailableData()
     sci.prepareAndExpose()
-
-#endregion exposed functions
+    return
 
 export default startupmodule

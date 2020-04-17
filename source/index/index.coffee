@@ -1,4 +1,4 @@
-import Modules from "./modules"
+import Modules from "./allmodules"
 
 global.allModules = Modules
 

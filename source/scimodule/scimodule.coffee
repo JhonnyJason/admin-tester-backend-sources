@@ -1,48 +1,168 @@
 
 scimodule = {name: "scimodule"}
-
-#region node_modules
-require('systemd')
-express = require('express')
-bodyParser = require('body-parser')
-#endregion
-
-#log Switch
+############################################################
 log = (arg) ->
     if allModules.debugmodule.modulesToDebug["scimodule"]?  then console.log "[scimodule]: " + arg
     return
 
-#region internal variables
-cfg = null
-
-app = null
+############################################################
+#region moduleFromEnvironment
+#region node_modules
+require('systemd')
+express = require('express')
+expressFileUpload = require("express-fileupload")
+bodyParser = require('body-parser')
 #endregion
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+############################################################
+cfg = null
+
+authHandler = null
+dataHandler = null
+assetHandler = null
+#endregion
+
+
+############################################################
+app = null
+
+############################################################
 scimodule.initialize = () ->
     log "scimodule.initialize"
     cfg = allModules.configmodule
-    
+    authHandler = allModules.authhandlermodule
+    dataHandler = allModules.datahandlermodule
+    assetHandler = allModules.assethandlermodule
+
     app = express()
     app.use bodyParser.urlencoded(extended: false)
     app.use bodyParser.json()
+    app.use expressFileUpload()
+    return
 
-#region internal functions
-onAction = (req, res) ->
-    log "onAction"
-    log "onAction - TODO implement!"
-    res.send("Not implemented yet!")
+############################################################
+#region internalFunctions
+onLogin = (req, res) ->
+    log "onLogin"
+    try
+        response = await authHandler.login(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
 
-onOtherAction = (req, res) ->
-    log "onOtherAction"
-    log "onOtherAction - TODO implement!"
+onTokenCheck = (req, res) ->
+    log "onTokenCheck"
+    try
+        response = await authHandler.tokenCheck(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onInvalidate = (req, res) ->
+    log "onInvalidate"
+    try
+        response = await authHandler.invalidate(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+
+onGetDataState = (req, res) ->
+    log "onGetDataState"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.dataState(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onGetOriginalContent = (req, res) ->
+    log "onGetOriginalContent"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.originalContent(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onGetCurrentEdits = (req, res) ->
+    log "onGetCurrentEdits"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.currentEdits(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+
+onUpdate = (req, res) ->
+    log "onUpdate"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.update(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onDiscard = (req, res) ->
+    log "onDiscard"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.discard(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onApply = (req, res) ->
+    log "onApply"
+    try
+        authHandler.authenticate(req)
+        response = await dataHandler.apply(req)
+        res.send(response)
+    catch err
+        res.sendStatus(403)
+    return
+
+onImageUpload = (req, res) ->
+    log "onImageUpload"
+    try
+        authHandler.authenticate(req)
+        assetHandler.saveImageFiles(req)
+        res.sendStatus(200)
+    catch err
+        log err
+        res.sendStatus(403)
+    return
+
+onPdfUpload = (req, res) ->
+    log "onPdfUpload"
+    log "onPdfUpload - TODO implement!"
     res.send("Not implemented yet!")
+    return
 
 #################################################################
 attachSCIFunctions = ->
     log "attachSCIFunctions"
-    app.post "/action", onAction
-    app.post "/otherAction", onOtherAction
+    app.post "/login", onLogin
+    app.post "/tokenCheck", onTokenCheck
+    app.post "/invalidate", onInvalidate
+    app.post "/getDataState", onGetDataState
+    app.post "/getOriginalContent", onGetOriginalContent
+    app.post "/getCurrentEdits", onGetCurrentEdits
+    app.post "/update", onUpdate
+    app.post "/discard", onDiscard
+    app.post "/apply", onApply
+    app.post "/uploadImage", onImageUpload
+    app.post "/uploadPdf", onPdfUpload
+    return
 
 listenForRequests = ->
     log "listenForRequests"
@@ -55,8 +175,8 @@ listenForRequests = ->
         log "listening on port: " + port
 #endregion
 
-
-#region exposed functions
+############################################################
+#region exposedFunctions
 scimodule.prepareAndExpose = ->
     log "scimodule.prepareAndExpose"
     attachSCIFunctions()

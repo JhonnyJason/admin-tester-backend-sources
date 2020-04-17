@@ -1,17 +1,24 @@
 configmodule = {name: "configmodule"}
-
-#log Switch
+############################################################
 log = (arg) ->
     if allModules.debugmodule.modulesToDebug["configmodule"]?  then console.log "[configmodule]: " + arg
     return
 
-
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
+############################################################
 configmodule.initialize = () ->
     log "configmodule.initialize"
 
-#region the configuration Object
+############################################################
 configmodule.defaultPort = 3333
-#endregion
+configmodule.defaultSecret = "defaultsecret"
 
+############################################################
+configmodule.imageBufferPath = "../images-buffer"
+configmodule.imageDeployPath = "../images-deploy" 
+configmodule.contentRepoPath = "../admin-tester-pwa-content" 
+configmodule.gitRootPath = "../" 
+## github access
+configmodule.user = "JhonnyJason"
+configmodule.pass = "hu8bu8bhbhu8gz7vi9njt6cf"
+configmodule.contentRepo = "github.com/JhonnyJason/admin-tester-pwa-content.git"
 export default configmodule

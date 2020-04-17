@@ -1,15 +1,19 @@
 debugmodule = {name: "debugmodule"}
 
-##initialization function  -> is automatically being called!  ONLY RELY ON DOM AND VARIABLES!! NO PLUGINS NO OHTER INITIALIZATIONS!!
-debugmodule.initialize = () ->
-    #console.log "debugmodule.initialize - nothing to do"
-    return
+############################################################
+debugmodule.initialize = -> return
 
+############################################################
 debugmodule.modulesToDebug = 
     unbreaker: true
-    configmodule: true
-    scimodule: true
+    assethandlermodule: true
+    # authhandlermodule: true
+    # configmodule: true
+    datahandlermodule: true
+    # githandlermodule: true
+    # scimodule: true
     # startupmodule: true
+
 #region exposed variables
 
 export default debugmodule
